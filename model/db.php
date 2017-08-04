@@ -49,4 +49,12 @@ class DB {
         }
         return null;
     }
+
+    public function simpleQuery($query) {
+        $raw = mysqli_query($this->link,$query);
+        if($raw){
+            return true;
+        }
+        return false;
+    }
 }
