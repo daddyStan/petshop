@@ -32,13 +32,6 @@ class api extends root
         echo "Уточните метод";
     }
 
-    /**
-     * Тестовый метод
-     */
-    public function user() {
-        echo "user";
-    }
-
     public function table() {
         if(isset($_GET['table']) && in_array($_GET['table'],$this->availibleTables)) {
             if(isset($_GET['id'])) {
@@ -62,13 +55,47 @@ class api extends root
         $this->renderJson();
     }
 
+    /**
+     *  Получаем параметры для записи на лекцию, проверяем их и, если всё ок, записываем
+     */
     public function SessionSubscribe() {
         if(isset($_GET['sessionId']) && isset($_GET['userId'])) {
-            $q = $this->db->dbQueryArryReturn("select * from `" . $_GET['table'] . "` where `ID`='" . $_GET['id'] . "' ");
+            $q = $this->db->dbQueryArryReturn("select * from `users` WHERE `ID`='" . $_GET['userId'] . "'");
+            if ($q) {
+                $q = $this->db->dbQueryArryReturn("select * from `session` WHERE `ID`='" . $_GET['sessionId'] . "'");
+                if($q) {
+                    $limit = $q[0]->SpeakersLimit;
+                }
+            }
+
+            $actualCount = $this->db->dbQueryArryReturn("SELECT * FROM `sessionspeakers` WHERE `SessionId`='" . $_GET['sessionId'] . "'");
+
+            if(!empty($limit)) {
+                if(count($actualCount) < $limit) {
+                    $q = $this->db->simpleQuery("INSERT INTO `sessionspeakers`(`UserId`, `SessionId`) VALUES ('" . $_GET['userId'] . "','" . $_GET['sessionId'] . "')");
+                    if ($q) {
+                        $this->status = 'ok';
+                        $this->data = [];
+                        $this->message = 'Спасибо, вы успешно записаны!';
+                    } else {
+                        $this->status = 'error';
+                        $this->data = [];
+                        $this->message = 'Произошла ошибка на уровне взаимодействия с базой данных, обратитесь к администратору. Обратите внимание, что один пользователь не может дважды записаться на одну и ту же лекцию';
+                    }
+                } else {
+                    $this->status = 'ok';
+                    $this->data = [];
+                    $this->message = 'Извините, все места заняты';
+                }
+            } else {
+                $this->status = 'error';
+                $this->data = [];
+                $this->message = 'Извините, кажется, Вы ввели некорректные данные';
+            }
         } else {
             $this->status = 'error';
             $this->data = [];
-            $this->message = 'Произошла ошибка на уровне взаимодействия с базой данных, обратитесь к администратору';
+            $this->message = 'Извините, кажется, Вы ввели некорректные данные';
         }
 
         $this->renderJson();
