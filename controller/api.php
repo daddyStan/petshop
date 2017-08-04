@@ -61,4 +61,16 @@ class api extends root
 
         $this->renderJson();
     }
+
+    public function SessionSubscribe() {
+        if(isset($_GET['sessionId']) && isset($_GET['userId'])) {
+            $q = $this->db->dbQueryArryReturn("select * from `" . $_GET['table'] . "` where `ID`='" . $_GET['id'] . "' ");
+        } else {
+            $this->status = 'error';
+            $this->data = [];
+            $this->message = 'Произошла ошибка на уровне взаимодействия с базой данных, обратитесь к администратору';
+        }
+
+        $this->renderJson();
+    }
 }
