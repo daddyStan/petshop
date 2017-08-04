@@ -10,8 +10,8 @@ $actualRoute = $_SERVER["REQUEST_URI"];
 
 $pattern = "/api/";
 $matches = [];
-$api = preg_match("/\/api\/[\w]+$/",$actualRoute);
-$api ? preg_match_all("/\/api\/([\w]+)$/",$actualRoute,$matches) : null;
+$api = preg_match( "/\/api\/[\w]+/",$actualRoute);
+$api ? preg_match_all("/\/api\/([\w]+)([\/\?])/",$actualRoute,$matches) : null;
 
 $allRouts = [
     '/' => 'view/index.php',
@@ -19,7 +19,7 @@ $allRouts = [
     'api' => [
         'controller' => 'api',
         'params' =>[
-            'method' => isset($matches[1][0]) ? $matches[1][0] : null
+            'method' => isset($matches[1][0]) ? $matches[1][0] : null,
         ]
     ]
 ];

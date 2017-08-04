@@ -38,9 +38,15 @@ class DB {
      * @param $query
      * @return bool| \mysqli | array
      */
-    public function dbQueryResourceReturn($query) {
+    public function dbQueryArryReturn($query) {
         $raw = mysqli_query($this->link,$query);
-        if($raw){return $raw;}
+        if($raw){
+            $arr = [];
+            while( $row = mysqli_fetch_object($raw) ){
+                $arr[] = $row;
+            }
+            return $arr;
+        }
         return null;
     }
 }
